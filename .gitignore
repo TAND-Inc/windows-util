@@ -1,0 +1,15 @@
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+*.swp
+.vscode/
+
+# transient
+*.log
+
+# FreeFileSync sync database / locks (local machine state, not the repo's)
+*.ffs_db
+*.ffs_lock
+
+# Claude Code personal/local config (keep shared settings.json committed)
+.claude/settings.local.json
