@@ -3,6 +3,6 @@ main = "worker/cloudflare-worker.js"
 compatibility_date = "2026-06-22"
 workers_dev = false
 
-[route]
-pattern = "get.tand.us/*"
-zone_name = "tand.us"
+[[routes]]
+pattern = "get.tand.us"
+custom_domain = true

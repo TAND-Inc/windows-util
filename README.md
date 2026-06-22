@@ -3,8 +3,8 @@
 This repository is a simple distribution point for Windows-focused PowerShell
 scripts. It supports two intended entry points:
 
-- Public shortcuts served from a trusted HTTPS domain, usually backed by a
-  Cloudflare Worker or redirect to GitHub release files.
+- Public shortcuts served from the Cloudflare Worker Custom Domain
+  `get.tand.us`.
 - LAN-only shortcuts served from an internal Caddy container for private network
   use.
 
@@ -25,7 +25,14 @@ irm https://get.tand.us/dev | iex
 The Cloudflare Worker in `worker/cloudflare-worker.js` maps friendly routes such
 as `/install` and `/dev` to raw PowerShell files in this GitHub repository.
 `wrangler.toml` points Cloudflare's Git-backed build at that Worker entrypoint
-and attaches the `get.tand.us/*` route.
+and configures the `get.tand.us` Worker Custom Domain.
+
+Cloudflare deployment and domain attachment are manual unless you configure
+Wrangler authentication. Test the returned script before executing it:
+
+```powershell
+irm https://get.tand.us/install
+```
 
 ## LAN Usage
 
