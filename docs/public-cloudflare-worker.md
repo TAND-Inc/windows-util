@@ -8,8 +8,8 @@ irm https://scripts.example.com/dev | iex
 irm https://scripts.example.com/uninstall | iex
 ```
 
-The Worker in `worker/cloudflare-worker.js` receives those routes, fetches the
-matching PowerShell file from GitHub raw content, and returns it as plain text.
+The Worker in `worker/cloudflare-worker.js` receives those routes, fetches the matching PowerShell file from GitHub raw content, and returns it as plain text.
+
 
 ## Configure the Worker
 
@@ -26,6 +26,7 @@ tag such as `v0.1.0` for `GITHUB_REF` when exposing a public command. A branch
 changes whenever new commits are pushed; a tag gives users a stable script until
 you intentionally publish a new tag and update the Worker.
 
+
 ## Deploy
 
 One simple workflow is:
@@ -39,6 +40,7 @@ One simple workflow is:
 
 Cloudflare can also be managed with Wrangler if you prefer a CLI workflow. This
 repo does not require Wrangler or any Node dependencies.
+
 
 ## Test
 
