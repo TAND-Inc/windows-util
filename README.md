@@ -1,98 +1,97 @@
-# Windows Setup Toolkit
+# Windows Script Distribution
 
-A config-driven PowerShell toolkit for provisioning new Windows machines. Run a
-single one-liner, pick apps and tweaks from a WPF menu, and let it install/run
-the selection.
+This repository is a simple distribution point for Windows-focused PowerShell
+scripts. It supports two intended entry points:
+
+- Public shortcuts served from a trusted HTTPS domain, usually backed by a
+  Cloudflare Worker or redirect to GitHub release files.
+- LAN-only shortcuts served from an internal Caddy container for private network
+  use.
+
+The repo also keeps the existing Windows setup toolkit launcher and example
+scripts, so future install/dev/uninstall entry points can grow without changing
+the hosting model.
+
+## Public Usage
+
+Use the public route only after you control and trust the domain and the script
+it serves:
 
 ```powershell
-irm https://raw.githubusercontent.com/TAND-Inc/win-util/main/launcher.ps1 | iex
+irm https://scripts.example.com/install | iex
+irm https://scripts.example.com/dev | iex
 ```
 
-## How it works
+The Cloudflare Worker in `worker/cloudflare-worker.js` maps friendly routes such
+as `/install` and `/dev` to raw PowerShell files in this GitHub repository.
 
-The launcher is intentionally thin. It does a handful of things: enforce TLS 1.2,
-check for admin, download the manifest, render a WPF menu from it, bootstrap winget
-if the selection needs it, and execute the selected items. Everything you'd actually
-want to change lives in data, not code.
+## LAN Usage
 
-```
-windows-setup-toolkit/
-├── launcher.ps1            # the irm target (rarely edited)
-├── config/
-│   └── apps.json           # the manifest — THIS is where you add things
-├── scripts/
-│   ├── Set-PowerPlanHigh.ps1
-│   ├── Set-ExplorerTweaks.ps1
-│   └── Disable-Telemetry.ps1
-└── docs/
-    └── conventions.md      # paste into your Claude Project instructions
+The LAN Caddy container serves the files from `scripts/` directly:
+
+```powershell
+irm http://scripts.home.arpa/install.ps1 | iex
 ```
 
-## Target environment & winget
+If you keep the sample Docker port mapping, include the port when testing:
 
-This is built for freshly-imaged **Windows 11 IoT Enterprise LTSC**, which ships
-**without the Microsoft Store** — so `winget` is **not present** on a clean box. The
-launcher bootstraps it on demand (`Install-Winget`) using the `Microsoft.WinGet.Client`
-PowerShell module and `Repair-WinGetPackageManager`, which pulls the right
-dependencies itself (don't hardcode VCLibs/UI.Xaml URLs — the old ones are dead).
-
-Because that bootstrap needs internet + admin and can still fail on a stripped image,
-must-have apps carry a direct-download **fallback** so they install either way.
-
-## Adding things
-
-Adding an app or tweak is a manifest edit, not a code change. Append an object
-to `items` in `config/apps.json`:
-
-| field       | meaning                                                              |
-|-------------|----------------------------------------------------------------------|
-| id          | unique short key                                                     |
-| name        | label shown in the menu                                              |
-| description | tooltip text                                                         |
-| category    | groups items under a heading in the UI                               |
-| method      | `winget`, `choco`, `download`, or `script`                           |
-| payload     | winget ID, choco package, or script filename (not used by `download`)|
-| default     | `true` to pre-check the box                                          |
-| fallback    | *(optional)* nested spec run if the primary fails — e.g. winget → download |
-
-For a `winget` item, find the ID with `winget search "<app>"`. For a `script` item,
-drop the `.ps1` file in `scripts/` and set `payload` to its filename.
-
-### The `download` method
-
-A direct vendor installer, used as a primary method or (more often) as a `fallback`:
-
-| field | meaning                                                                     |
-|-------|-----------------------------------------------------------------------------|
-| url   | installer URL (redirects are followed)                                      |
-| file  | *(optional)* output filename — also decides `.msi` vs `.exe` handling       |
-| args  | *(optional)* silent switches; for `.msi`, `msiexec /i <file>` is prepended  |
-
-Example — winget primary with a direct-download fallback:
-
-```json
-{
-  "id": "chrome", "name": "Google Chrome", "description": "Web browser",
-  "category": "Browsers", "method": "winget", "payload": "Google.Chrome",
-  "default": true,
-  "fallback": {
-    "method": "download",
-    "url": "https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi",
-    "file": "googlechromestandaloneenterprise64.msi",
-    "args": "/qn /norestart"
-  }
-}
+```powershell
+irm http://scripts.home.arpa:8085/install.ps1 | iex
 ```
 
-## Publishing
+## Recommended Release Workflow
 
-1. Set `$BaseUrl` at the top of `launcher.ps1` to your repo's raw base
-   (already set to `https://raw.githubusercontent.com/TAND-Inc/win-util/main`).
-2. Optionally point a short/custom URL at the raw `launcher.ps1` so the command
-   stays memorable and you can re-point it without changing what people type.
+For public commands, prefer Git tags or GitHub releases instead of pointing users
+at `main`.
 
-**Security note:** `irm | iex` is the same pattern malware droppers use, so EDR/AV
-may flag it. For production rollout, pin to a git **tag** rather than `main` so a
-bad commit can't silently propagate, and review the launcher before wide use. Note
-that `raw.githubusercontent.com` caches branch URLs briefly, so a push to `main`
-can take a few minutes to propagate — pinning to a tag/SHA also avoids that surprise.
+1. Review and test the scripts locally.
+2. Commit the changes.
+3. Create a version tag, for example `v0.1.0`.
+4. Update the Worker raw URL to point at that tag.
+5. Deploy the Worker.
+
+Pinned tags make the public shortcut stable. A future push to `main` will not
+silently change what users receive until you intentionally update the Worker.
+
+## Security Notes
+
+`irm <url> | iex` downloads code and immediately executes it. Use this pattern
+only with domains and scripts you control and trust. Prefer HTTPS for public
+scripts, review changes before tagging releases, and consider code signing later
+if this becomes a broader distribution channel.
+
+This repository intentionally contains no secrets. Do not commit API tokens,
+passwords, private URLs, certificates, or environment-specific credentials.
+
+More detail is in:
+
+- `docs/public-cloudflare-worker.md`
+- `docs/lan-caddy-hosting.md`
+- `docs/security-notes.md`
+
+## Project Layout
+
+```text
+.
+|-- README.md
+|-- launcher.ps1
+|-- config/
+|   `-- apps.json
+|-- docs/
+|   |-- conventions.md
+|   |-- lan-caddy-hosting.md
+|   |-- public-cloudflare-worker.md
+|   `-- security-notes.md
+|-- scripts/
+|   |-- install.ps1
+|   |-- dev.ps1
+|   |-- uninstall.ps1
+|   |-- lib/
+|   |   `-- common.ps1
+|   `-- *.ps1
+|-- worker/
+|   `-- cloudflare-worker.js
+`-- lan/
+    |-- Caddyfile
+    `-- docker-compose.yml
+```

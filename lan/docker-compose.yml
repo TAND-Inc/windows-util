@@ -1,0 +1,10 @@
+services:
+  caddy:
+    image: caddy:2
+    container_name: windows-util-scripts
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    volumes:
+      - ../scripts:/srv/scripts:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
