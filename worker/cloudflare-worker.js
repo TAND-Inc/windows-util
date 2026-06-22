@@ -7,9 +7,9 @@
 //                 "v0.1.0" for public use
 //
 // Example public commands:
-//   irm https://scripts.example.com/install | iex
-//   irm https://scripts.example.com/dev | iex
-//   irm https://scripts.example.com/uninstall | iex
+//   irm https://get.tand.us/install | iex
+//   irm https://get.tand.us/dev | iex
+//   irm https://get.tand.us/uninstall | iex
 
 const GITHUB_OWNER = "TAND-Inc";
 const GITHUB_REPO = "windows-util";
@@ -22,10 +22,45 @@ const ROUTES = {
   "/launcher": "launcher.ps1",
 };
 
+const HELP_TEXT = `Windows Script Distribution
+
+Available routes:
+  /install
+  /dev
+  /uninstall
+  /launcher
+  /health
+
+Example:
+  irm https://get.tand.us/install | iex
+`;
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    const scriptPath = ROUTES[url.pathname.replace(/\/$/, "")];
+    const path = url.pathname.replace(/\/$/, "") || "/";
+
+    if (path === "/") {
+      return new Response(HELP_TEXT, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+
+    if (path === "/health") {
+      return new Response("ok\n", {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+
+    const scriptPath = ROUTES[path];
 
     if (!scriptPath) {
       return new Response("Not found\n", {

@@ -11,7 +11,7 @@
     .\uninstall.ps1
 
 .EXAMPLE
-    irm https://scripts.example.com/uninstall | iex
+    irm https://get.tand.us/uninstall | iex
 #>
 
 Set-StrictMode -Version Latest

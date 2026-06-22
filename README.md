@@ -18,12 +18,14 @@ Use the public route only after you control and trust the domain and the script
 it serves:
 
 ```powershell
-irm https://scripts.example.com/install | iex
-irm https://scripts.example.com/dev | iex
+irm https://get.tand.us/install | iex
+irm https://get.tand.us/dev | iex
 ```
 
 The Cloudflare Worker in `worker/cloudflare-worker.js` maps friendly routes such
 as `/install` and `/dev` to raw PowerShell files in this GitHub repository.
+`wrangler.toml` points Cloudflare's Git-backed build at that Worker entrypoint
+and attaches the `get.tand.us/*` route.
 
 ## LAN Usage
 
@@ -73,6 +75,7 @@ More detail is in:
 
 ```text
 .
+|-- wrangler.toml
 |-- README.md
 |-- launcher.ps1
 |-- config/

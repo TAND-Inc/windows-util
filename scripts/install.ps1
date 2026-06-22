@@ -6,7 +6,7 @@
 .DESCRIPTION
     This script is safe to run locally or through:
 
-        irm https://scripts.example.com/install | iex
+        irm https://get.tand.us/install | iex
 
     It prints environment details and placeholder setup sections. It does not
     make destructive changes.
@@ -15,7 +15,7 @@
     .\install.ps1
 
 .EXAMPLE
-    irm https://scripts.example.com/install | iex
+    irm https://get.tand.us/install | iex
 #>
 
 Set-StrictMode -Version Latest
@@ -57,7 +57,7 @@ Import-CommonHelpers
 Add-CommonFallbacks
 
 Write-Host "Windows Script Distribution - Install" -ForegroundColor Cyan
-Write-Host "Placeholder domain: scripts.example.com"
+Write-Host "Public route: https://get.tand.us/install"
 
 Write-Section "Environment"
 $isAdmin = Test-IsAdmin

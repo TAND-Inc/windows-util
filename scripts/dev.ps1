@@ -7,13 +7,13 @@
     This script is intended for non-destructive validation while developing the
     distribution project. It can be run locally or through:
 
-        irm https://scripts.example.com/dev | iex
+        irm https://get.tand.us/dev | iex
 
 .EXAMPLE
     .\dev.ps1
 
 .EXAMPLE
-    irm https://scripts.example.com/dev | iex
+    irm https://get.tand.us/dev | iex
 #>
 
 Set-StrictMode -Version Latest
