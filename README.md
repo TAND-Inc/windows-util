@@ -5,7 +5,7 @@ single one-liner, pick apps and tweaks from a WPF menu, and let it install/run
 the selection.
 
 ```powershell
-irm https://raw.githubusercontent.com/TAND-Inc/tand-windows-setup/main/launcher.ps1 | iex
+irm https://raw.githubusercontent.com/TAND-Inc/win-util/main/launcher.ps1 | iex
 ```
 
 ## How it works
@@ -86,11 +86,9 @@ Example — winget primary with a direct-download fallback:
 
 ## Publishing
 
-1. Create a GitHub repo and push this folder to it. Use a **public** repo — private
-   repos require a token in the URL, which breaks the clean one-liner.
-2. Set `$BaseUrl` at the top of `launcher.ps1` to your repo's raw base
-   (already set to `https://raw.githubusercontent.com/TAND-Inc/tand-windows-setup/main`).
-3. Optionally point a short/custom URL at the raw `launcher.ps1` so the command
+1. Set `$BaseUrl` at the top of `launcher.ps1` to your repo's raw base
+   (already set to `https://raw.githubusercontent.com/TAND-Inc/win-util/main`).
+2. Optionally point a short/custom URL at the raw `launcher.ps1` so the command
    stays memorable and you can re-point it without changing what people type.
 
 **Security note:** `irm | iex` is the same pattern malware droppers use, so EDR/AV
@@ -98,4 +96,3 @@ may flag it. For production rollout, pin to a git **tag** rather than `main` so 
 bad commit can't silently propagate, and review the launcher before wide use. Note
 that `raw.githubusercontent.com` caches branch URLs briefly, so a push to `main`
 can take a few minutes to propagate — pinning to a tag/SHA also avoids that surprise.
-
