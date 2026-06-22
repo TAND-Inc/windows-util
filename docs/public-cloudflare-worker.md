@@ -18,13 +18,13 @@ Edit `worker/cloudflare-worker.js` and replace the placeholder GitHub values:
 ```javascript
 const GITHUB_OWNER = "TAND-Inc";
 const GITHUB_REPO = "windows-util";
-const GITHUB_REF = "v0.1.0";
+const GITHUB_REF = "main";
 ```
 
-Use a release tag such as `v0.1.0` for `GITHUB_REF` when exposing a public
-command. `main` is convenient during early testing, but a branch changes whenever
-new commits are pushed. A tag gives users a stable script until you intentionally
-publish a new tag and update the Worker.
+Use `main` for early testing before the first release tag exists. Use a release
+tag such as `v0.1.0` for `GITHUB_REF` when exposing a public command. A branch
+changes whenever new commits are pushed; a tag gives users a stable script until
+you intentionally publish a new tag and update the Worker.
 
 ## Deploy
 

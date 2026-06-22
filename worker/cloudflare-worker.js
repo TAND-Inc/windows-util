@@ -3,7 +3,8 @@
 // Replace these placeholders before deploying:
 //   GITHUB_OWNER: your GitHub username or organization
 //   GITHUB_REPO:  your repository name
-//   GITHUB_REF:   prefer a release tag such as "v0.1.0" for public use
+//   GITHUB_REF:   use "main" for early testing; prefer a release tag such as
+//                 "v0.1.0" for public use
 //
 // Example public commands:
 //   irm https://scripts.example.com/install | iex
@@ -12,7 +13,7 @@
 
 const GITHUB_OWNER = "TAND-Inc";
 const GITHUB_REPO = "windows-util";
-const GITHUB_REF = "v0.1.0";
+const GITHUB_REF = "main";
 
 const ROUTES = {
   "/install": "scripts/install.ps1",
