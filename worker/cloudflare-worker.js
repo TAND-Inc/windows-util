@@ -19,7 +19,7 @@ const ROUTES = {
   "/install": "scripts/install.ps1",
   "/dev": "scripts/dev.ps1",
   "/uninstall": "scripts/uninstall.ps1",
-  "/launch": "launcher.ps1",
+  "/launcher": "launcher.ps1",
 };
 
 export default {
