@@ -1,59 +1,62 @@
 # LAN Caddy Hosting
 
-The LAN hosting files run a small Caddy container on port `8085`. It serves the
-local `scripts/` directory for shared script entry points and the local `lan/`
-directory for LAN-only manifest and tools.
+The LAN hosting stack runs a small custom Caddy image on port `8085` by default.
+It serves public script entry points from `scripts/` and LAN-only manifest/tools
+from `lan/`.
 
-## Start the Server
+The supported Portainer deployment now builds the image from this Git repository
+instead of bind-mounting repository files into the container. During image build:
+
+- `scripts/` is copied into `/srv/scripts/`.
+- `lan/` is copied into `/srv/lan/`.
+- `lan/Caddyfile` is copied into `/etc/caddy/Caddyfile`.
+
+No host bind mounts are used for `/srv/scripts`, `/srv/lan`, or `/etc/caddy`.
+This avoids Portainer relative path handling and file-vs-directory bind mount
+issues.
+
+## Portainer Deployment
+
+Create a Portainer Git Repository stack with:
+
+```text
+Repository URL: <this repository URL>
+Compose path: docker-compose.yml
+```
+
+The root `docker-compose.yml` builds the image with:
+
+```text
+context: .
+dockerfile: lan/Dockerfile
+```
+
+The default published port is `8085`. To change it, set:
+
+```text
+LAN_SCRIPT_PORT=<port>
+```
+
+Do not use `lan/docker-compose.yml`; that older bind-mount stack has been
+removed.
+
+## Local Docker Test
 
 From the repository root:
 
 ```powershell
-docker compose -f .\lan\docker-compose.yml up -d
+docker compose up -d --build
 ```
-
-The compose file maps host port `8085` to container port `80`, mounts
-`../scripts` as read-only script content, mounts the compose directory itself as
-read-only LAN-only content, and generates `/etc/caddy/Caddyfile` inside the
-container at startup.
-
-Portainer had trouble with file-to-file Caddyfile bind mounts, so this stack
-does not mount `./Caddyfile` or the `lan/` directory to `/etc/caddy`. The
-checked-in `lan/Caddyfile` remains a readable reference, while
-`lan/docker-compose.yml` writes the runtime Caddyfile with a shell heredoc and
-then runs:
-
-```text
-caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
-```
-
-When deploying through Portainer, set the Compose path to:
-
-```text
-lan/docker-compose.yml
-```
-
-Because that compose file lives inside `lan/`, relative bind mounts are resolved
-from the `lan/` directory. In this stack, `./` means the repo's `lan/` folder,
-not the repository root.
 
 ## Test by IP Address
 
 Replace `SERVER-IP` with the IP address of the machine running the container:
 
 ```powershell
+irm http://SERVER-IP:8085/install.ps1
 irm http://SERVER-IP:8085/install.ps1 | iex
-```
-
-You can also test the non-destructive development entry point:
-
-```powershell
 irm http://SERVER-IP:8085/dev.ps1 | iex
-```
-
-Test the LAN-aware launcher manifest and placeholder LAN diagnostics:
-
-```powershell
+irm http://SERVER-IP:8085/uninstall.ps1 | iex
 irm http://SERVER-IP:8085/lan-manifest.json
 irm http://SERVER-IP:8085/lan/lan-diagnostics.ps1 | iex
 ```
@@ -72,13 +75,6 @@ Then test:
 irm http://scripts.home.arpa:8085/install.ps1 | iex
 irm http://scripts.home.arpa:8085/lan-manifest.json
 irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
-```
-
-If you want the shorter command below, map host port `80` to container port `80`
-in `lan/docker-compose.yml` instead of using `8085`:
-
-```powershell
-irm http://scripts.home.arpa/install.ps1 | iex
 ```
 
 Keep this service behind internal DNS and firewall rules. Do not expose the LAN

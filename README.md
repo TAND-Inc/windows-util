@@ -66,8 +66,19 @@ irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
 
 ## LAN Usage
 
-The LAN Caddy container serves the files from `scripts/` directly and also
-serves LAN-only files from `lan/`:
+The LAN version is intended for internal network use only. It builds a small
+custom Caddy image from this repository, copies `scripts/` and `lan/` into the
+image, and serves them from inside the container. No host bind mounts are used
+for served files.
+
+For Portainer, deploy this repo as a Git Repository stack and use the root
+Compose path:
+
+```text
+docker-compose.yml
+```
+
+The LAN container should not be exposed directly to the internet.
 
 ```powershell
 irm http://scripts.home.arpa/install.ps1 | iex
@@ -114,6 +125,9 @@ More detail is in:
 
 ```text
 .
+|-- docker-compose.yml
+|-- .dockerignore
+|-- .env.example
 |-- wrangler.toml
 |-- README.md
 |-- launcher.ps1
@@ -136,7 +150,7 @@ More detail is in:
 |   `-- cloudflare-worker.js
 `-- lan/
     |-- Caddyfile
-    |-- docker-compose.yml
+    |-- Dockerfile
     |-- lan-manifest.json
     `-- lan-diagnostics.ps1
 ```

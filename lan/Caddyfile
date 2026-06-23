@@ -10,7 +10,7 @@
         handle_path /lan/* {
             root * /srv/lan
             file_server {
-                hide Caddyfile docker-compose.yml
+                hide Caddyfile docker-compose.yml Dockerfile
             }
         }
 

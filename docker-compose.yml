@@ -1,0 +1,10 @@
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: lan/Dockerfile
+    image: windows-util-scripts:local
+    container_name: windows-util-scripts
+    restart: unless-stopped
+    ports:
+      - "${LAN_SCRIPT_PORT:-8085}:80"
