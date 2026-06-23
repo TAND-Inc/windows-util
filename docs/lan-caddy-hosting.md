@@ -1,7 +1,8 @@
 # LAN Caddy Hosting
 
-The LAN hosting files run a small Caddy container that serves the local
-`scripts/` directory on port `8085`.
+The LAN hosting files run a small Caddy container on port `8085`. It serves the
+local `scripts/` directory for shared script entry points and the local `lan/`
+directory for LAN-only manifest and tools.
 
 ## Start the Server
 
@@ -12,8 +13,8 @@ docker compose -f .\lan\docker-compose.yml up -d
 ```
 
 The compose file maps host port `8085` to container port `80`, mounts
-`../scripts` as read-only content, and mounts `lan/Caddyfile` as the Caddy
-configuration.
+`../scripts` as read-only script content, mounts `../lan` as read-only LAN-only
+content, and mounts `lan/Caddyfile` as the Caddy configuration.
 
 ## Test by IP Address
 
@@ -29,6 +30,13 @@ You can also test the non-destructive development entry point:
 irm http://SERVER-IP:8085/dev.ps1 | iex
 ```
 
+Test the LAN-aware launcher manifest and placeholder LAN diagnostics:
+
+```powershell
+irm http://SERVER-IP:8085/lan-manifest.json
+irm http://SERVER-IP:8085/lan/lan-diagnostics.ps1 | iex
+```
+
 ## Internal DNS
 
 Create an internal DNS record:
@@ -41,6 +49,8 @@ Then test:
 
 ```powershell
 irm http://scripts.home.arpa:8085/install.ps1 | iex
+irm http://scripts.home.arpa:8085/lan-manifest.json
+irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
 ```
 
 If you want the shorter command below, map host port `80` to container port `80`

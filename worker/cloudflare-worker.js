@@ -7,19 +7,22 @@
 //                 "v0.1.0" for public use
 //
 // Example public commands:
+//   irm https://get.tand.us/launcher | iex
 //   irm https://get.tand.us/install | iex
 //   irm https://get.tand.us/dev | iex
 //   irm https://get.tand.us/uninstall | iex
 
 const GITHUB_OWNER = "TAND-Inc";
 const GITHUB_REPO = "windows-util";
+// Use "main" for early testing. Prefer a release tag, such as "v0.1.0", before
+// exposing this as a stable public command.
 const GITHUB_REF = "main";
 
 const ROUTES = {
   "/install": "scripts/install.ps1",
   "/dev": "scripts/dev.ps1",
   "/uninstall": "scripts/uninstall.ps1",
-  "/launcher": "launcher.ps1",
+  "/launcher": "scripts/launcher.ps1",
 };
 
 const HELP_TEXT = `Windows Script Distribution
@@ -32,7 +35,7 @@ Available routes:
   /health
 
 Example:
-  irm https://get.tand.us/install | iex
+  irm https://get.tand.us/launcher | iex
 `;
 
 export default {

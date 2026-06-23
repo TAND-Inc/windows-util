@@ -18,6 +18,7 @@ Use the public route only after you control and trust the domain and the script
 it serves:
 
 ```powershell
+irm https://get.tand.us/launcher | iex
 irm https://get.tand.us/install | iex
 irm https://get.tand.us/dev | iex
 ```
@@ -34,9 +35,39 @@ Wrangler authentication. Test the returned script before executing it:
 irm https://get.tand.us/install
 ```
 
+## LAN-Aware Launcher
+
+The main public launcher command is:
+
+```powershell
+irm https://get.tand.us/launcher | iex
+```
+
+The launcher works from anywhere. When it runs from inside the LAN, it probes:
+
+```text
+http://scripts.home.arpa:8085/lan-manifest.json
+```
+
+If that LAN manifest responds with the expected `TAND-LAN-LAUNCHER-v1` marker,
+the launcher shows a LAN Tools menu. Outside the LAN, or when internal DNS is
+unavailable, LAN Tools are hidden.
+
+Menu hiding is not a security boundary. LAN-only scripts must still be protected
+by the LAN Caddy server and firewall rules.
+
+Test commands:
+
+```powershell
+irm https://get.tand.us/launcher | iex
+irm http://scripts.home.arpa:8085/lan-manifest.json
+irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
+```
+
 ## LAN Usage
 
-The LAN Caddy container serves the files from `scripts/` directly:
+The LAN Caddy container serves the files from `scripts/` directly and also
+serves LAN-only files from `lan/`:
 
 ```powershell
 irm http://scripts.home.arpa/install.ps1 | iex
@@ -75,6 +106,7 @@ passwords, private URLs, certificates, or environment-specific credentials.
 More detail is in:
 
 - `docs/public-cloudflare-worker.md`
+- `docs/lan-aware-launcher.md`
 - `docs/lan-caddy-hosting.md`
 - `docs/security-notes.md`
 
@@ -94,6 +126,7 @@ More detail is in:
 |   `-- security-notes.md
 |-- scripts/
 |   |-- install.ps1
+|   |-- launcher.ps1
 |   |-- dev.ps1
 |   |-- uninstall.ps1
 |   |-- lib/
@@ -103,5 +136,7 @@ More detail is in:
 |   `-- cloudflare-worker.js
 `-- lan/
     |-- Caddyfile
-    `-- docker-compose.yml
+    |-- docker-compose.yml
+    |-- lan-manifest.json
+    `-- lan-diagnostics.ps1
 ```

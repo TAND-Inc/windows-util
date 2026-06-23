@@ -1,7 +1,8 @@
 # Project conventions (paste into Claude Project custom instructions)
 
-This project maintains the Windows Setup Toolkit: a config-driven PowerShell
-provisioning tool launched via `irm <url>/launcher.ps1 | iex`.
+This project maintains the Windows Setup Toolkit and script distribution
+launcher. The public text launcher is run with `irm https://get.tand.us/launcher
+| iex`; the root `launcher.ps1` remains the config-driven WPF provisioning tool.
 
 ## Target environment
 - Machines are freshly-imaged **Windows 11 IoT Enterprise LTSC**. These ship

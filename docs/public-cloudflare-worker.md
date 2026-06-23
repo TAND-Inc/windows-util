@@ -106,6 +106,7 @@ executing anything:
 
 ```powershell
 irm https://get.tand.us/health
+irm https://get.tand.us/launcher
 irm https://get.tand.us/install
 irm https://get.tand.us/dev
 irm https://get.tand.us/uninstall
@@ -114,6 +115,7 @@ irm https://get.tand.us/uninstall
 Only pipe to `iex` after reviewing the returned script:
 
 ```powershell
+irm https://get.tand.us/launcher | iex
 irm https://get.tand.us/install | iex
 irm https://get.tand.us/dev | iex
 irm https://get.tand.us/uninstall | iex
