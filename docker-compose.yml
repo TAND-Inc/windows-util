@@ -1,10 +1,44 @@
 services:
   caddy:
-    build:
-      context: .
-      dockerfile: lan/Dockerfile
-    image: windows-util-scripts:local
+    image: caddy:2-alpine
     container_name: windows-util-scripts
     restart: unless-stopped
     ports:
       - "${LAN_SCRIPT_PORT:-8085}:80"
+    volumes:
+      - type: bind
+        source: ${LAN_SCRIPT_SOURCE:?LAN_SCRIPT_SOURCE_not_set}
+        target: /srv/scripts
+        read_only: true
+        bind:
+          create_host_path: false
+    command:
+      - sh
+      - -c
+      - |
+        echo "===== Mounted LAN script source ====="
+        ls -la /srv/scripts || true
+
+        if [ ! -f /srv/scripts/install.ps1 ]; then
+          echo "WARNING: /srv/scripts/install.ps1 was not found."
+          echo "Verify LAN_SCRIPT_SOURCE points to the mounted NAS/private script folder on the Docker host."
+        fi
+
+        mkdir -p /etc/caddy
+
+        cat > /etc/caddy/Caddyfile <<'EOF'
+        :80 {
+            @lan remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+            handle @lan {
+                root * /srv/scripts
+                file_server {
+                    hide .git .env .env.* *.secret *.key Caddyfile docker-compose.yml Dockerfile
+                }
+            }
+
+            respond "Forbidden" 403
+        }
+        EOF
+
+        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile

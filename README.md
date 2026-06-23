@@ -66,28 +66,66 @@ irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
 
 ## LAN Usage
 
-The LAN version is intended for internal network use only. It builds a small
-custom Caddy image from this repository, copies `scripts/` and `lan/` into the
-image, and serves them from inside the container. No host bind mounts are used
-for served files.
+The LAN version is intended for internal network use only. This GitHub repo
+contains deployment scaffolding, docs, and safe examples. The actual LAN scripts
+live outside GitHub on a NAS-mounted or private Docker host folder.
 
-For Portainer, deploy this repo as a Git Repository stack and use the root
-Compose path:
+Portainer deploys this repo as a Git Repository stack. The Caddy container
+mounts the private script folder read-only and serves that folder to RFC1918 LAN
+clients. No private LAN scripts are committed to GitHub, and the container should
+not be exposed directly to the internet.
+
+For Portainer, use:
 
 ```text
-docker-compose.yml
+Deployment method: Git Repository
+Repository URL: this repo
+Compose path: docker-compose.yml
 ```
 
-The LAN container should not be exposed directly to the internet.
+Set these Portainer environment variables:
+
+```text
+LAN_SCRIPT_SOURCE=/mnt/windows-util-scripts
+LAN_SCRIPT_PORT=8085
+```
+
+`LAN_SCRIPT_SOURCE` must be an absolute path on the Docker host. It should point
+to a NAS-mounted or private local folder that already exists.
+
+Test from a LAN Windows workstation:
 
 ```powershell
-irm http://scripts.home.arpa/install.ps1 | iex
+irm http://SERVER-IP:8085/install.ps1
+irm http://SERVER-IP:8085/install.ps1 | iex
+irm http://SERVER-IP:8085/dev.ps1 | iex
+irm http://SERVER-IP:8085/uninstall.ps1 | iex
+irm http://SERVER-IP:8085/lan-manifest.json
+irm http://SERVER-IP:8085/lan/lan-diagnostics.ps1 | iex
 ```
 
-If you keep the sample Docker port mapping, include the port when testing:
+With internal DNS:
+
+```text
+scripts.home.arpa -> SERVER-IP
+```
+
+Then:
 
 ```powershell
 irm http://scripts.home.arpa:8085/install.ps1 | iex
+```
+
+Example private folder structure:
+
+```text
+/mnt/windows-util-scripts/
+|-- install.ps1
+|-- dev.ps1
+|-- uninstall.ps1
+|-- lan-manifest.json
+`-- lan/
+    `-- lan-diagnostics.ps1
 ```
 
 ## Recommended Release Workflow
@@ -134,10 +172,13 @@ More detail is in:
 |-- config/
 |   `-- apps.json
 |-- docs/
+|   |-- lan-aware-launcher.md
 |   |-- conventions.md
 |   |-- lan-caddy-hosting.md
 |   |-- public-cloudflare-worker.md
 |   `-- security-notes.md
+|-- examples/
+|   `-- private-script-source/
 |-- scripts/
 |   |-- install.ps1
 |   |-- launcher.ps1
@@ -150,7 +191,4 @@ More detail is in:
 |   `-- cloudflare-worker.js
 `-- lan/
     |-- Caddyfile
-    |-- Dockerfile
-    |-- lan-manifest.json
-    `-- lan-diagnostics.ps1
 ```

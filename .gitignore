@@ -1,5 +1,12 @@
 # Environment and local secrets
 .env
+.env.*
+!.env.example
+private-scripts/
+local-scripts/
+nas-scripts/
+*.secret
+*.key
 
 # Logs and transient output
 *.log

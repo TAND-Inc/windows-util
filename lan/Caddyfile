@@ -2,21 +2,9 @@
     @lan remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
 
     handle @lan {
-        handle /lan-manifest.json {
-            root * /srv/lan
-            file_server
-        }
-
-        handle_path /lan/* {
-            root * /srv/lan
-            file_server {
-                hide Caddyfile docker-compose.yml Dockerfile
-            }
-        }
-
-        handle {
-            root * /srv/scripts
-            file_server
+        root * /srv/scripts
+        file_server {
+            hide .git .env .env.* *.secret *.key Caddyfile docker-compose.yml Dockerfile
         }
     }
 

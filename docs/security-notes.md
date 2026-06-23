@@ -18,9 +18,16 @@ it only with scripts and domains you control and trust.
 - Restrict the Caddy container to private network clients.
 - Do not expose the LAN Caddy container directly to the internet.
 - Use placeholder domains in public docs and examples.
+- Do not put private LAN scripts in public GitHub.
+- Keep the NAS share permission-limited.
+- Use a read-only NAS user for the Caddy container's source folder where
+  possible.
+- `irm | iex` is powerful and should only be used with trusted internal hosts.
 
 ## Future Hardening
 
 Consider code signing if these scripts become widely distributed. For larger
 payloads, consider hash validation before execution or installation. If scripts
 download installers, prefer vendor HTTPS URLs and stable release artifacts.
+Consider HTTPS internally later if needed; HTTP is acceptable for a tightly
+controlled LAN-only first version.

@@ -65,7 +65,8 @@ JSON response, or marker mismatch keeps LAN Tools hidden.
 
 ## Adding LAN tools
 
-Add LAN-only tools to `lan/lan-manifest.json`:
+Add LAN-only tools to `lan-manifest.json` inside the private script source
+folder configured by `LAN_SCRIPT_SOURCE`, not to this public GitHub repo:
 
 ```json
 {
@@ -75,8 +76,12 @@ Add LAN-only tools to `lan/lan-manifest.json`:
 }
 ```
 
-Then add the script under `lan/` and update the launcher menu logic if the tool
-needs a dedicated menu option. Keep LAN scripts safe to review and run with:
+Then add the script under the private source folder's `lan/` subfolder and
+update the launcher menu logic if the tool needs a dedicated menu option. The
+harmless example structure in `examples/private-script-source/` can be copied to
+your NAS/private folder as a starting point.
+
+Keep LAN scripts safe to review and run with:
 
 ```powershell
 irm http://scripts.home.arpa:8085/lan/example-tool.ps1
@@ -87,6 +92,7 @@ Only pipe to `iex` after reviewing the returned script.
 ## Security notes
 
 - Do not put secrets in the manifest.
+- Do not put private LAN scripts in public GitHub.
 - Do not expose the LAN Caddy server directly to the internet.
 - Keep Caddy private IP restrictions in place.
 - Treat the LAN tool menu as convenience, not access control.

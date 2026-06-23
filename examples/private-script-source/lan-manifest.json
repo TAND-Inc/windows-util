@@ -1,6 +1,6 @@
 {
   "marker": "TAND-LAN-LAUNCHER-v1",
-  "name": "TAND LAN Launcher",
+  "name": "Example Private LAN Launcher",
   "version": "0.1.0",
   "tools": [
     {

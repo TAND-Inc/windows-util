@@ -1,6 +1,10 @@
 .git
 .gitignore
 .env
+.env.*
+!.env.example
+*.secret
+*.key
 *.log
 node_modules
 dist
