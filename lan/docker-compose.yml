@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: caddy:2
+    image: caddy:2-alpine
     container_name: windows-util-scripts
     restart: unless-stopped
     ports:
@@ -8,4 +8,4 @@ services:
     volumes:
       - ../scripts:/srv/scripts:ro
       - ../lan:/srv/lan:ro
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../lan:/etc/caddy:ro
