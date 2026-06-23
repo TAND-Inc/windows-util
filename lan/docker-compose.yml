@@ -7,5 +7,5 @@ services:
       - "8085:80"
     volumes:
       - ../scripts:/srv/scripts:ro
-      - ../lan:/srv/lan:ro
-      - ../lan:/etc/caddy:ro
+      - ./:/srv/lan:ro
+      - ./:/etc/caddy:ro
