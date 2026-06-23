@@ -14,8 +14,18 @@ docker compose -f .\lan\docker-compose.yml up -d
 
 The compose file maps host port `8085` to container port `80`, mounts
 `../scripts` as read-only script content, mounts the compose directory itself as
-read-only LAN-only content, and mounts the compose directory itself as
-`/etc/caddy` so Caddy can find `/etc/caddy/Caddyfile`.
+read-only LAN-only content, and generates `/etc/caddy/Caddyfile` inside the
+container at startup.
+
+Portainer had trouble with file-to-file Caddyfile bind mounts, so this stack
+does not mount `./Caddyfile` or the `lan/` directory to `/etc/caddy`. The
+checked-in `lan/Caddyfile` remains a readable reference, while
+`lan/docker-compose.yml` writes the runtime Caddyfile with a shell heredoc and
+then runs:
+
+```text
+caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+```
 
 When deploying through Portainer, set the Compose path to:
 

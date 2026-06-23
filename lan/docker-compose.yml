@@ -8,4 +8,37 @@ services:
     volumes:
       - ../scripts:/srv/scripts:ro
       - ./:/srv/lan:ro
-      - ./:/etc/caddy:ro
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /etc/caddy
+
+        cat > /etc/caddy/Caddyfile <<'EOF'
+        :80 {
+            @lan remote_ip 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+            handle @lan {
+                handle /lan-manifest.json {
+                    root * /srv/lan
+                    file_server
+                }
+
+                handle_path /lan/* {
+                    root * /srv/lan
+                    file_server {
+                        hide Caddyfile docker-compose.yml
+                    }
+                }
+
+                handle {
+                    root * /srv/scripts
+                    file_server
+                }
+            }
+
+            respond "Forbidden" 403
+        }
+        EOF
+
+        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
