@@ -43,15 +43,38 @@ The main public launcher command is:
 irm https://get.tand.us/launcher | iex
 ```
 
-The launcher works from anywhere. When it runs from inside the LAN, it probes:
+The launcher works from anywhere and always opens the main public menu first.
+The main menu includes a LAN Mode option. When it starts, it probes:
 
 ```text
 http://scripts.home.arpa:8085/lan-manifest.json
 ```
 
 If that LAN manifest responds with the expected `TAND-LAN-LAUNCHER-v1` marker,
-the launcher shows a LAN Tools menu. Outside the LAN, or when internal DNS is
-unavailable, LAN Tools are hidden.
+LAN Mode is marked as detected. Outside the LAN, or when internal DNS is
+unavailable, choose LAN Mode and manually enter the LAN base URL, for example:
+
+```text
+http://SERVER-IP:8085
+```
+
+The launcher can save the URL for future launches in the current user's config:
+
+```text
+%APPDATA%\TAND\WindowsUtil\config.json
+```
+
+You can also set an override with a user environment variable:
+
+```powershell
+[Environment]::SetEnvironmentVariable("TAND_LAN_BASE_URL", "http://SERVER-IP:8085", "User")
+```
+
+For the current PowerShell session only:
+
+```powershell
+$env:TAND_LAN_BASE_URL = "http://SERVER-IP:8085"
+```
 
 Menu hiding is not a security boundary. LAN-only scripts must still be protected
 by the LAN Caddy server and firewall rules.
@@ -62,6 +85,15 @@ Test commands:
 irm https://get.tand.us/launcher | iex
 irm http://scripts.home.arpa:8085/lan-manifest.json
 irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
+```
+
+Advanced launcher usage:
+
+```powershell
+$script = irm https://get.tand.us/launcher
+& ([scriptblock]::Create($script)) -Lan
+& ([scriptblock]::Create($script)) -Lan -LanBaseUrl 'http://SERVER-IP:8085'
+& ([scriptblock]::Create($script)) -DebugLan
 ```
 
 ## LAN Usage
