@@ -6,12 +6,7 @@ services:
     ports:
       - "${LAN_SCRIPT_PORT:-8085}:80"
     volumes:
-      - type: bind
-        source: ${LAN_SCRIPT_SOURCE:?LAN_SCRIPT_SOURCE_not_set}
-        target: /srv/scripts
-        read_only: true
-        bind:
-          create_host_path: false
+      - unas_windows_util_scripts:/srv/scripts:ro
     command:
       - sh
       - -c
@@ -42,3 +37,8 @@ services:
         EOF
 
         exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+
+volumes:
+  unas_windows_util_scripts:
+    external: true
+    name: unas_windows_util_scripts
