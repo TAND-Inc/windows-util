@@ -16,7 +16,7 @@ services:
 
         if [ ! -f /srv/scripts/install.ps1 ]; then
           echo "WARNING: /srv/scripts/install.ps1 was not found."
-          echo "Verify LAN_SCRIPT_SOURCE points to the mounted NAS/private script folder on the Docker host."
+          echo "Verify the Portainer volume 'unas_win_util_scripts' is mapped to the NAS share."
         fi
 
         mkdir -p /etc/caddy
