@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "chrome", "name": "Google Chrome", "description": "Web browser", "category": "Browsers",
+      "method": "winget", "payload": "Google.Chrome", "default": true,
+      "fallback": {
+        "method": "download",
+        "url": "https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi",
+        "file": "googlechromestandaloneenterprise64.msi",
+        "args": "/qn /norestart"
+      }
+    },
+    {
+      "id": "firefox", "name": "Mozilla Firefox", "description": "Web browser", "category": "Browsers",
+      "method": "winget", "payload": "Mozilla.Firefox", "default": false,
+      "fallback": {
+        "method": "download",
+        "url": "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US",
+        "file": "firefox-setup.exe",
+        "args": "/S"
+      }
+    },
+
+    {
+      "id": "7zip", "name": "7-Zip", "description": "File archiver", "category": "Utilities",
+      "method": "winget", "payload": "7zip.7zip", "default": true,
+      "fallback": {
+        "method": "download",
+        "url": "https://www.7-zip.org/a/7z2301-x64.exe",
+        "file": "7zip-x64.exe",
+        "args": "/S"
+      }
+    },
+    {
+      "id": "notepadpp", "name": "Notepad++", "description": "Text/code editor", "category": "Utilities",
+      "method": "winget", "payload": "Notepad++.Notepad++", "default": true,
+      "fallback": {
+        "method": "download",
+        "url": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.2/npp.8.6.2.Installer.x64.exe",
+        "file": "npp-installer-x64.exe",
+        "args": "/S"
+      }
+    },
+    {
+      "id": "powertoys", "name": "PowerToys", "description": "Windows power-user utilities", "category": "Utilities",
+      "method": "winget", "payload": "Microsoft.PowerToys", "default": true,
+      "fallback": {
+        "method": "download",
+        "url": "https://github.com/microsoft/PowerToys/releases/download/v0.79.0/PowerToysSetup-0.79.0-x64.exe",
+        "file": "PowerToysSetup-x64.exe",
+        "args": "/install /quiet /norestart"
+      }
+    },
+    { "id": "vlc",           "name": "VLC Media Player",   "description": "Media player",                        "category": "Utilities",  "method": "winget", "payload": "VideoLAN.VLC",                   "default": false },
+    {
+      "id": "sumatra", "name": "SumatraPDF", "description": "Lightweight PDF / ebook reader", "category": "Utilities",
+      "method": "winget", "payload": "SumatraPDF.SumatraPDF", "default": false,
+      "fallback": {
+        "method": "download",
+        "url": "https://www.sumatrapdfreader.org/dl/rel/3.5.2/SumatraPDF-3.5.2-64-install.exe",
+        "file": "SumatraPDF-install.exe",
+        "args": "-install -all-users -s"
+      }
+    },
+
+    {
+      "id": "git", "name": "Git", "description": "Version control", "category": "Dev / IT",
+      "method": "winget", "payload": "Git.Git", "default": true, "detect": "Git version",
+      "fallback": {
+        "method": "download",
+        "url": "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe",
+        "file": "Git-64-bit.exe",
+        "args": "/VERYSILENT /NORESTART /NOCANCEL /SP-"
+      }
+    },
+    {
+      "id": "vscode", "name": "VS Code", "description": "Code editor", "category": "Dev / IT",
+      "method": "winget", "payload": "Microsoft.VisualStudioCode", "default": true, "detect": "Visual Studio Code",
+      "fallback": {
+        "method": "download",
+        "url": "https://update.code.visualstudio.com/latest/win32-x64/stable",
+        "file": "VSCodeSetup-x64.exe",
+        "args": "/VERYSILENT /NORESTART /MERGETASKS=!runcode"
+      }
+    },
+    { "id": "winterminal",   "name": "Windows Terminal",   "description": "Modern terminal",                     "category": "Dev / IT",   "method": "winget", "payload": "Microsoft.WindowsTerminal",      "default": true  },
+    {
+      "id": "pwsh", "name": "PowerShell 7", "description": "Cross-platform PowerShell", "category": "Dev / IT",
+      "method": "winget", "payload": "Microsoft.PowerShell", "default": true,
+      "fallback": {
+        "method": "download",
+        "url": "https://github.com/PowerShell/PowerShell/releases/download/v7.4.5/PowerShell-7.4.5-win-x64.msi",
+        "file": "PowerShell-7-x64.msi",
+        "args": "/qn /norestart"
+      }
+    },
+
+    {
+      "id": "zoom", "name": "Zoom", "description": "Video conferencing", "category": "Comms",
+      "method": "winget", "payload": "Zoom.Zoom", "default": false,
+      "fallback": {
+        "method": "download",
+        "url": "https://zoom.us/client/latest/ZoomInstallerFull.msi?archType=x64",
+        "file": "ZoomInstallerFull.msi",
+        "args": "/qn /norestart"
+      }
+    },
+    { "id": "slack",         "name": "Slack",              "description": "Team chat",                           "category": "Comms",      "method": "winget", "payload": "SlackTechnologies.Slack",        "default": false },
+
+    {
+      "id": "monday", "name": "monday.com Desktop", "description": "monday.com Work OS desktop app",
+      "category": "Productivity", "method": "download",
+      "url": "https://monday.com/desktop-app/monday-msi-latest.msi",
+      "file": "monday-desktop.msi", "args": "/qn /norestart",
+      "detect": "monday.com", "default": false
+    },
+
+    { "id": "anydesk",       "name": "AnyDesk",            "description": "Remote support",                      "category": "Remote",     "method": "winget", "payload": "AnyDeskSoftwareGmbH.AnyDesk",    "default": false },
+    { "id": "teamviewer",    "name": "TeamViewer",         "description": "Remote support",                      "category": "Remote",     "method": "winget", "payload": "TeamViewer.TeamViewer",          "default": false },
+
+    {
+      "id": "createuser", "name": "Create local user",
+      "description": "Create a local Windows account (prompts for name and password)",
+      "category": "System", "method": "script", "payload": "New-LocalUserAccount.ps1", "default": false
+    },
+    {
+      "id": "winutil", "name": "Chris Titus WinUtil",
+      "description": "Launch ChrisTitusTech WinUtil (runs irm christitus.com/win | iex)",
+      "category": "System", "method": "irm", "payload": "https://christitus.com/win", "default": false
+    },
+    {
+      "id": "export-drivers", "name": "Export drivers (backup)",
+      "description": "Back up all third-party drivers to a folder you choose (Export-WindowsDriver, DISM fallback)",
+      "category": "System", "method": "script", "payload": "Export-Drivers.ps1", "default": false
+    },
+    {
+      "id": "import-drivers", "name": "Import drivers (restore)",
+      "description": "Install all drivers from a folder you choose (pnputil /add-driver /subdirs /install)",
+      "category": "System", "method": "script", "payload": "Import-Drivers.ps1", "default": false
+    },
+
+    {
+      "id": "powerplan", "name": "High Performance power plan",
+      "description": "Activate the High Performance power scheme",
+      "category": "Tweaks", "method": "script", "payload": "Set-PowerPlanHigh.ps1", "default": true,
+      "check": { "type": "powerplan", "guid": "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" }
+    },
+    {
+      "id": "explorer", "name": "Explorer tweaks",
+      "description": "Show file extensions, hidden files, open to This PC",
+      "category": "Tweaks", "method": "script", "payload": "Set-ExplorerTweaks.ps1", "default": true,
+      "check": [
+        { "type": "registry", "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "HideFileExt", "value": 0 },
+        { "type": "registry", "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "Hidden", "value": 1 },
+        { "type": "registry", "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "name": "LaunchTo", "value": 1 }
+      ]
+    },
+    {
+      "id": "telemetry", "name": "Minimize telemetry",
+      "description": "Set Windows telemetry policy to the lowest allowed level",
+      "category": "Tweaks", "method": "script", "payload": "Disable-Telemetry.ps1", "default": false,
+      "check": { "type": "registry", "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection", "name": "AllowTelemetry", "value": 0 }
+    }
+  ]
+}

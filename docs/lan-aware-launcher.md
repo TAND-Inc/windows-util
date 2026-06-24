@@ -1,66 +1,78 @@
-# LAN-Aware Launcher
+# WPF WAN/LAN Launcher
 
-The public launcher is intended to be run from anywhere:
+The public WAN launcher is:
 
 ```powershell
 irm https://get.tand.us/launcher | iex
 ```
 
-It always opens the main public menu first. The main menu includes a LAN Mode
-option. When the same launcher is run from inside the LAN, it probes an
-internal-only manifest endpoint and marks LAN Mode as detected if the manifest
-is reachable and trusted.
+The private LAN launcher is:
 
-## Why the launcher probes the LAN
-
-The Cloudflare Worker cannot reliably determine whether the original client is
-on the private LAN. Depending on routing, proxying, and NAT, Cloudflare may only
-see the public WAN address. That is not enough to decide whether LAN-only tools
-should be shown.
-
-Instead, the launcher runs on the Windows client and probes an internal-only
-endpoint:
-
-```text
-http://scripts.home.arpa:8085/lan-manifest.json
+```powershell
+irm https://get.home.us/launcher | iex
 ```
 
-It also tries the optional alternate endpoint:
+Temporary LAN test forms are also supported when the exported bootstrap was
+generated with the matching base URL:
 
-```text
-http://get-lan.tand.us:8085/lan-manifest.json
+```powershell
+irm http://get.home.us:8085/launcher | iex
+irm http://scripts.home.arpa:8085/launcher | iex
+irm http://SERVER-IP:8085/launcher | iex
 ```
 
-If no endpoint responds quickly, LAN Mode remains available from the main menu
-and prompts for a manual LAN base URL. This keeps the public launcher responsive
-outside the LAN while still allowing IP-based LAN use.
+## Shared WPF Engine
 
-## LAN detection order
+`lib/wpf-menu-engine.ps1` renders the same WPF GUI in both modes:
 
-The launcher tries LAN base URLs in this order:
+- Categories
+- Checkboxes
+- Installed/applied status where possible
+- Select All
+- Clear
+- Recommended
+- Switch to LAN/WAN
+- Close
+- Run Selected
 
-1. The `-LanBaseUrl` parameter.
-2. The `TAND_LAN_BASE_URL` environment variable.
-3. User config at `%APPDATA%\TAND\WindowsUtil\config.json`.
+WAN mode loads `config/wan-apps.json` from `https://get.tand.us`. LAN mode loads
+`/lan-manifest.json` from the LAN base URL.
+
+## Mode Switching
+
+In WAN mode, the footer button says `Switch to LAN`. The engine tries:
+
+1. `-LanBaseUrl` or an existing LAN mode base URL.
+2. `TAND_LAN_BASE_URL`.
+3. `%APPDATA%\TAND\WindowsUtil\config.json`.
 4. Default internal DNS candidates:
+   - `https://get.home.us`
+   - `http://get.home.us:8085`
    - `http://scripts.home.arpa:8085`
    - `http://windows-util-scripts.home.arpa:8085`
-   - `http://windows-util-scripts.local:8085`
 
-Each candidate is tested with `GET /lan-manifest.json` and a short timeout.
-Private IP addresses are not hardcoded as defaults in this public repo.
+Each candidate is tested with `GET /lan-manifest.json`. Private IP addresses are
+not hardcoded as defaults in this public repo.
+
+In LAN mode, the footer button says `Switch to WAN`. Switching to WAN loads the
+public manifest from `https://get.tand.us`. If WAN is unreachable, the engine
+shows a friendly message and stays in LAN mode.
 
 ## Manual LAN URL
 
-If auto-detection fails, choose LAN Mode and enter the LAN base URL manually:
+If auto-detection fails, enter the LAN base URL manually:
 
 ```text
 http://SERVER-IP:8085
 ```
 
-The launcher trims trailing slashes, validates
-`http://SERVER-IP:8085/lan-manifest.json`, and can save the working URL for the
-current user:
+The engine validates:
+
+```text
+http://SERVER-IP:8085/lan-manifest.json
+```
+
+The working URL can be saved for the current user:
 
 ```text
 %APPDATA%\TAND\WindowsUtil\config.json
@@ -74,7 +86,7 @@ Example saved config:
 }
 ```
 
-## Environment override
+## Environment Override
 
 Set a persistent user environment variable:
 
@@ -88,83 +100,84 @@ For the current PowerShell session only:
 $env:TAND_LAN_BASE_URL = "http://SERVER-IP:8085"
 ```
 
-## Advanced launch examples
+## LAN Offline Export
 
-Simple usage still opens the main menu:
-
-```powershell
-irm https://get.tand.us/launcher | iex
-```
-
-Parameter usage:
+The LAN menu must work without Cloudflare or GitHub. Export the WPF engine and
+LAN bootstrapper into the private LAN folder served by Caddy:
 
 ```powershell
-$script = irm https://get.tand.us/launcher
-& ([scriptblock]::Create($script)) -Lan
-& ([scriptblock]::Create($script)) -Lan -LanBaseUrl 'http://SERVER-IP:8085'
-& ([scriptblock]::Create($script)) -DebugLan
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl https://get.home.us
 ```
 
-Use `D. Diagnostics / Debug` from the launcher menus, or `-DebugLan`, to show
-candidate LAN URLs tested, manifest test results, and the selected LAN base URL.
+For temporary IP testing:
 
-## Internal DNS
+```powershell
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl http://SERVER-IP:8085 -Force
+```
 
-Create an internal DNS record that resolves only on the private network:
+The helper writes:
 
 ```text
-scripts.home.arpa -> LAN server IP
+launcher
+launcher.ps1
+lib/wpf-menu-engine.ps1
+lan-manifest.example.json
 ```
 
-Optional alternate internal DNS:
+It does not copy private scripts, installers, credentials, `.env` files, or Git
+metadata.
 
-```text
-get-lan.tand.us -> LAN server IP
-```
+## Manifest Schema
 
-The exact internal DNS names can be changed later in `scripts/launcher.ps1`.
+WAN and LAN manifests use the same `items` schema. Keep compatibility with
+`config/apps.json` fields:
 
-## Manifest marker
+- `id`
+- `name`
+- `category`
+- `description`
+- `default`
+- `method`
+- `payload`
+- `url`
+- `file`
+- `args`
+- `detect`
+- `check`
+- `fallback`
 
-The LAN manifest must include this marker:
+Supported methods:
+
+- `winget`
+- `choco`
+- `download`
+- `script`
+- `irm`
+
+Example LAN item:
 
 ```json
 {
-  "marker": "TAND-LAN-LAUNCHER-v1"
+  "id": "lan-diagnostics",
+  "name": "LAN Diagnostics",
+  "category": "LAN Tools",
+  "description": "Run basic LAN diagnostics.",
+  "default": false,
+  "method": "script",
+  "payload": "scripts/lan-diagnostics.ps1"
 }
 ```
 
-The launcher treats LAN mode as available only when the manifest is reachable
-and the marker matches exactly. A DNS failure, timeout, HTTP failure, invalid
-JSON response, or marker mismatch keeps LAN Tools hidden.
+In LAN mode, `scripts/lan-diagnostics.ps1` resolves to:
 
-## Adding LAN tools
-
-Add LAN-only tools to `lan-manifest.json` inside the private script source
-folder configured by `LAN_SCRIPT_SOURCE`, not to this public GitHub repo:
-
-```json
-{
-  "id": "example-tool",
-  "name": "Example Tool",
-  "scriptUrl": "http://scripts.home.arpa:8085/lan/example-tool.ps1"
-}
+```text
+$LanBaseUrl/scripts/lan-diagnostics.ps1
 ```
 
-Then add the script under the private source folder's `lan/` subfolder and
-update the launcher menu logic if the tool needs a dedicated menu option. The
-harmless example structure in `examples/private-script-source/` can be copied to
-your NAS/private folder as a starting point.
+The harmless example structure in `examples/private-script-source/` can be
+copied to your NAS/private folder as a starting point.
 
-Keep LAN scripts safe to review and run with:
-
-```powershell
-irm http://scripts.home.arpa:8085/lan/example-tool.ps1
-```
-
-Only pipe to `iex` after reviewing the returned script.
-
-## Security notes
+## Security Notes
 
 - Do not put secrets in the manifest.
 - Do not put private LAN scripts in public GitHub.

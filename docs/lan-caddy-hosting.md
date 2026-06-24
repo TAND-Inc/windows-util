@@ -37,16 +37,34 @@ silently creating and serving an empty folder.
 Use `examples/private-script-source/` as a harmless starting point, then copy the
 real scripts into your private NAS or Docker host folder.
 
+Export the public-safe WPF LAN bootstrap and engine into that same private
+folder:
+
+```powershell
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl https://get.home.us
+```
+
+For temporary IP testing:
+
+```powershell
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl http://SERVER-IP:8085 -Force
+```
+
 ## Example Private Script Folder Structure
 
 ```text
 /mnt/windows-util-scripts/
+|-- launcher
+|-- launcher.ps1
 |-- install.ps1
 |-- dev.ps1
 |-- uninstall.ps1
 |-- lan-manifest.json
-`-- lan/
-    `-- lan-diagnostics.ps1
+|-- lib/
+|   `-- wpf-menu-engine.ps1
+|-- scripts/
+|   `-- lan-diagnostics.ps1
+`-- installers/
 ```
 
 The LAN-aware public launcher expects `lan-manifest.json` to include:
@@ -117,8 +135,9 @@ irm http://SERVER-IP:8085/install.ps1
 irm http://SERVER-IP:8085/install.ps1 | iex
 irm http://SERVER-IP:8085/dev.ps1 | iex
 irm http://SERVER-IP:8085/uninstall.ps1 | iex
+irm http://SERVER-IP:8085/launcher | iex
 irm http://SERVER-IP:8085/lan-manifest.json
-irm http://SERVER-IP:8085/lan/lan-diagnostics.ps1 | iex
+irm http://SERVER-IP:8085/scripts/lan-diagnostics.ps1 | iex
 ```
 
 If you create internal DNS:
@@ -131,6 +150,8 @@ Then test:
 
 ```powershell
 irm http://scripts.home.arpa:8085/install.ps1 | iex
+irm http://scripts.home.arpa:8085/launcher | iex
+irm http://scripts.home.arpa:8085/scripts/lan-diagnostics.ps1 | iex
 ```
 
 ## Troubleshooting

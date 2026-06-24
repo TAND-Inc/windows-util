@@ -1,16 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Public launcher with optional LAN mode for the Windows script distribution project.
+    Legacy console fallback launcher for the Windows script distribution project.
 
 .DESCRIPTION
-    Intended public entry point:
+    Legacy fallback entry point:
 
-        irm https://get.tand.us/launcher | iex
+        irm https://get.tand.us/console | iex
 
     Advanced usage when passing parameters through Invoke-Expression:
 
-        $script = irm https://get.tand.us/launcher
+        $script = irm https://get.tand.us/console
         & ([scriptblock]::Create($script)) -Lan
         & ([scriptblock]::Create($script)) -Lan -LanBaseUrl 'http://SERVER-IP:8085'
 
@@ -342,7 +342,7 @@ function Show-LanMenu {
 
     do {
         Clear-Host
-        Write-Host 'Windows Script Distribution Launcher - LAN Mode' -ForegroundColor Cyan
+        Write-Host 'Windows Script Distribution Console Fallback - LAN Mode' -ForegroundColor Cyan
         Write-Host "LAN: Detected at $($script:LanState.BaseUrl)" -ForegroundColor Green
         Write-Host ''
         Write-Host '1. Install'
@@ -378,7 +378,7 @@ function Show-LanMenu {
 function Show-MainMenu {
     do {
         Clear-Host
-        Write-Host 'Windows Script Distribution Launcher' -ForegroundColor Cyan
+        Write-Host 'Windows Script Distribution Console Fallback' -ForegroundColor Cyan
         Write-Host "LAN: $($script:LanState.Status)"
         Write-Host ''
         Write-Host '1. Public Install'

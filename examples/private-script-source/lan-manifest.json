@@ -2,16 +2,15 @@
   "marker": "TAND-LAN-LAUNCHER-v1",
   "name": "Example Private LAN Launcher",
   "version": "0.1.0",
-  "tools": [
+  "items": [
     {
       "id": "lan-diagnostics",
       "name": "LAN Diagnostics",
-      "scriptUrl": "http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1"
-    },
-    {
-      "id": "local-index",
-      "name": "Local Script Index",
-      "scriptUrl": "http://scripts.home.arpa:8085/"
+      "category": "LAN Tools",
+      "description": "Run basic LAN diagnostics.",
+      "default": false,
+      "method": "script",
+      "payload": "scripts/lan-diagnostics.ps1"
     }
   ]
 }

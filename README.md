@@ -8,9 +8,9 @@ scripts. It supports two intended entry points:
 - LAN-only shortcuts served from an internal Caddy container for private network
   use.
 
-The repo also keeps the existing Windows setup toolkit launcher and example
-scripts, so future install/dev/uninstall entry points can grow without changing
-the hosting model.
+The primary launcher experience is the WPF Windows Setup Toolkit. The same WPF
+engine runs in WAN mode with a public-safe manifest and in LAN mode with a
+private manifest served from the LAN script server.
 
 ## Public Usage
 
@@ -19,12 +19,12 @@ it serves:
 
 ```powershell
 irm https://get.tand.us/launcher | iex
-irm https://get.tand.us/install | iex
-irm https://get.tand.us/dev | iex
 ```
 
-The Cloudflare Worker in `worker/cloudflare-worker.js` maps friendly routes such
-as `/install` and `/dev` to raw PowerShell files in this GitHub repository.
+`/launcher` opens the WPF GUI in WAN mode. The WAN manifest is
+`config/wan-apps.json`, served through the Cloudflare Worker. Public-safe script
+items resolve relative to `https://get.tand.us`.
+
 `wrangler.toml` points Cloudflare's Git-backed build at that Worker entrypoint
 and configures the `get.tand.us` Worker Custom Domain.
 
@@ -35,66 +35,59 @@ Wrangler authentication. Test the returned script before executing it:
 irm https://get.tand.us/install
 ```
 
-## LAN-Aware Launcher
+## WPF WAN/LAN Launcher
 
-The main public launcher command is:
+WAN/Public GUI:
 
 ```powershell
 irm https://get.tand.us/launcher | iex
 ```
 
-The launcher works from anywhere and always opens the main public menu first.
-The main menu includes a LAN Mode option. When it starts, it probes:
-
-```text
-http://scripts.home.arpa:8085/lan-manifest.json
-```
-
-If that LAN manifest responds with the expected `TAND-LAN-LAUNCHER-v1` marker,
-LAN Mode is marked as detected. Outside the LAN, or when internal DNS is
-unavailable, choose LAN Mode and manually enter the LAN base URL, for example:
-
-```text
-http://SERVER-IP:8085
-```
-
-The launcher can save the URL for future launches in the current user's config:
-
-```text
-%APPDATA%\TAND\WindowsUtil\config.json
-```
-
-You can also set an override with a user environment variable:
+LAN/Private GUI:
 
 ```powershell
-[Environment]::SetEnvironmentVariable("TAND_LAN_BASE_URL", "http://SERVER-IP:8085", "User")
+irm https://get.home.us/launcher | iex
 ```
 
-For the current PowerShell session only:
+Temporary LAN testing alternatives:
 
 ```powershell
-$env:TAND_LAN_BASE_URL = "http://SERVER-IP:8085"
+irm http://get.home.us:8085/launcher | iex
+irm http://scripts.home.arpa:8085/launcher | iex
+irm http://SERVER-IP:8085/launcher | iex
+```
+
+The WPF footer includes `Switch to LAN` in WAN mode and `Switch to WAN` in LAN
+mode. The switch uses the same shared engine and reloads the correct manifest.
+
+The legacy console launcher remains available as a fallback at:
+
+```powershell
+irm https://get.tand.us/console | iex
 ```
 
 Menu hiding is not a security boundary. LAN-only scripts must still be protected
 by the LAN Caddy server and firewall rules.
 
-Test commands:
+## LAN Launcher Export
+
+The LAN GUI must work even when the LAN has no access to Cloudflare or GitHub.
+Export the public-safe WPF engine and LAN bootstrapper to the private
+NAS/Caddy folder:
 
 ```powershell
-irm https://get.tand.us/launcher | iex
-irm http://scripts.home.arpa:8085/lan-manifest.json
-irm http://scripts.home.arpa:8085/lan/lan-diagnostics.ps1 | iex
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl https://get.home.us
 ```
 
-Advanced launcher usage:
+For temporary IP testing, export with the test base URL:
 
 ```powershell
-$script = irm https://get.tand.us/launcher
-& ([scriptblock]::Create($script)) -Lan
-& ([scriptblock]::Create($script)) -Lan -LanBaseUrl 'http://SERVER-IP:8085'
-& ([scriptblock]::Create($script)) -DebugLan
+.\tools\export-lan-launcher.ps1 -DestinationPath \\NAS\WindowsUtilScripts -LanBaseUrl http://SERVER-IP:8085 -Force
 ```
+
+The helper writes `launcher`, `launcher.ps1`, and `lib/wpf-menu-engine.ps1`. It
+does not copy private scripts or credentials. Create your private
+`lan-manifest.json`, `scripts/`, and `installers/` in the destination folder.
 
 ## LAN Usage
 
@@ -132,8 +125,9 @@ irm http://SERVER-IP:8085/install.ps1
 irm http://SERVER-IP:8085/install.ps1 | iex
 irm http://SERVER-IP:8085/dev.ps1 | iex
 irm http://SERVER-IP:8085/uninstall.ps1 | iex
+irm http://SERVER-IP:8085/launcher | iex
 irm http://SERVER-IP:8085/lan-manifest.json
-irm http://SERVER-IP:8085/lan/lan-diagnostics.ps1 | iex
+irm http://SERVER-IP:8085/scripts/lan-diagnostics.ps1 | iex
 ```
 
 With internal DNS:
@@ -146,18 +140,24 @@ Then:
 
 ```powershell
 irm http://scripts.home.arpa:8085/install.ps1 | iex
+irm http://scripts.home.arpa:8085/launcher | iex
 ```
 
 Example private folder structure:
 
 ```text
 /mnt/windows-util-scripts/
+|-- launcher
+|-- launcher.ps1
 |-- install.ps1
 |-- dev.ps1
 |-- uninstall.ps1
 |-- lan-manifest.json
-`-- lan/
-    `-- lan-diagnostics.ps1
+|-- lib/
+|   `-- wpf-menu-engine.ps1
+|-- scripts/
+|   `-- lan-diagnostics.ps1
+`-- installers/
 ```
 
 ## Recommended Release Workflow
@@ -201,8 +201,11 @@ More detail is in:
 |-- wrangler.toml
 |-- README.md
 |-- launcher.ps1
+|-- lib/
+|   `-- wpf-menu-engine.ps1
 |-- config/
-|   `-- apps.json
+|   |-- apps.json
+|   `-- wan-apps.json
 |-- docs/
 |   |-- lan-aware-launcher.md
 |   |-- conventions.md
@@ -221,6 +224,8 @@ More detail is in:
 |   `-- *.ps1
 |-- worker/
 |   `-- cloudflare-worker.js
+|-- tools/
+|   `-- export-lan-launcher.ps1
 `-- lan/
     |-- Caddyfile
 ```

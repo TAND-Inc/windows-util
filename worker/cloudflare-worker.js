@@ -22,7 +22,8 @@ const ROUTES = {
   "/install": "scripts/install.ps1",
   "/dev": "scripts/dev.ps1",
   "/uninstall": "scripts/uninstall.ps1",
-  "/launcher": "scripts/launcher.ps1",
+  "/launcher": "launcher.ps1",
+  "/console": "scripts/launcher.ps1",
 };
 
 const HELP_TEXT = `Windows Script Distribution
@@ -32,6 +33,7 @@ Available routes:
   /dev
   /uninstall
   /launcher
+  /console
   /health
 
 Example:
@@ -63,7 +65,16 @@ export default {
       });
     }
 
-    const scriptPath = ROUTES[path];
+    let scriptPath = ROUTES[path];
+    if (!scriptPath && path.startsWith("/scripts/")) {
+      scriptPath = path.replace(/^\//, "");
+    }
+    if (!scriptPath && path.startsWith("/config/")) {
+      scriptPath = path.replace(/^\//, "");
+    }
+    if (!scriptPath && path.startsWith("/lib/")) {
+      scriptPath = path.replace(/^\//, "");
+    }
 
     if (!scriptPath) {
       return new Response("Not found\n", {
